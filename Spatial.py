@@ -53,22 +53,7 @@ def SpatialDetached(e):
 def ErrorEvent(e, eCode, description):
     print("Error %i : %s" % (eCode, description))
 
-"""def AvarageX(listOfX):
-    
-    avX = 0 
-    sumX = 0
-    count = len(listOfX)
 
-    print("IN THE METHOD") #, count
-
-    for i in listOfX:
-        print("Element: %d" %i)
-        sumX = sumX + i
-        count = count + 1 
-
-   # avX = sumX / count
-
-    return avX"""
 """
 Contains data for acceleration/gyro/compass depending on what the board supports, as well as a timestamp.
 This event is fired at a fixed rate as determined by the DataRate property.
