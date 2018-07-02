@@ -53,7 +53,6 @@ def SpatialDetached(e):
 def ErrorEvent(e, eCode, description):
     print("Error %i : %s" % (eCode, description))
 
-
 """
 Contains data for acceleration/gyro/compass depending on what the board supports, as well as a timestamp.
 This event is fired at a fixed rate as determined by the DataRate property.
@@ -69,30 +68,13 @@ def SpatialDataHandler(e, acceleration, angularRate, fieldStrength, timestamp):
     print("Acceleration:   %7.3f  %8.3f  %8.3f" % (acceleration[0], acceleration[1], acceleration[2]))
     print("Angular rate:   %7.3f  %8.3f  %8.3f \n" % (angularRate[0], angularRate[1], angularRate[2]))
 
-
     
-    
-"""    with open('spatial_data.csv', 'w') as csvfile:
-        fieldnames = ['FieldStrX', 'FieldStrY', 'FieldStrY', 'AccX', 'AccY', 'AccZ', 'AngRateX', 'AngRateY', 'AngRateZ']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-     
-        writer.writeheader()
-        writer.writerows({'FieldStrX' : fieldStrength[0], 'FieldStrY' : fieldStrength[1], 
-            'FieldStrY' : fieldStrength[2], 'AccX' : acceleration[0], 'AccY' : acceleration[1], 
-            'AccZ' : acceleration[2], 'AngRateX' : angularRate[0], 'AngRateY' : angularRate[1], 
-            'AngRateZ' : angularRate[2]})"""
-    
-   # filePlot = open("plotNorthSteadyX.txt", "a")
-   # filePlot.write("%7.3f" % (fieldStrength[0]))
-
-
-    #file.close()
-    #stop writing data
-    # print("Acceleration  : %7.3f  %8.3f  %8.3f" % (acceleration[0], acceleration[1], acceleration[2]))
-    # print("Angular Rate  : %7.3f  %8.3f  %s8.3f" % (angularRate[0], angularRate[1], angularRate[2]))
-    # print("Field Strength: %7.3f  %8.3f  %8.3f" % (fieldStrength[0], fieldStrength[1], fieldStrength[2]))
-    # print("Timestamp: %f\n" % timestamp)
-
+    with open('spatial_data.csv', 'a') as csv_file:
+        csv_writer = csv.DictWriter(csv_file, fieldnames=fields)
+        csv_writer.writerow({'FieldStrX' : fieldStrength[0], 'FieldStrY' : fieldStrength[1], 'FieldStrZ' : fieldStrength[1],
+                            'AccX' : acceleration[0], 'AccY' : acceleration[1], 'AccZ' : acceleration[2], 
+                            'AngRateX' : angularRate[0], 'AngRateY' : angularRate[1], 'AngRateZ' : angularRate[2]}) 
+   
 try:
     ch.setOnAttachHandler(SpatialAttached)
     ch.setOnDetachHandler(SpatialDetached)
@@ -103,7 +85,13 @@ try:
     print("Waiting for the Phidget Spatial Object to be attached...")
 
     file = open("NE.txt", "a")
+    filecsv = open("spatial_data.csv", "a")
     file.write("--------------------------------------------")
+
+    with open('spatial_data.csv', 'a') as csv_file:
+        fields = ['FieldStrX', 'FieldStrY', 'FieldStrZ', 'AccX', 'AccY', 'AccZ', 'AngRateX', 'AngRateY', 'AngRateZ']
+        csv_writer = csv.DictWriter(csv_file, fieldnames=fields)
+        csv_writer.writeheader()
     #file.write("\n")
 
     ch.openWaitForAttachment(5000)
@@ -115,7 +103,7 @@ except PhidgetException as e:
     exit(1)
 
 print("Gathering data for 10 seconds...")
-time.sleep(10)
+time.sleep(1)
 
 try:
     ch.close()
@@ -126,4 +114,3 @@ except PhidgetException as e:
     exit(1) 
 print("Closed Spatial device")
 exit(0)
-
