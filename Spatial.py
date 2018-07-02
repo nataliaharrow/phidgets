@@ -1,9 +1,12 @@
 import sys
 import time 
+import csv
 from Phidget22.Devices.Spatial import *
 from Phidget22.PhidgetException import *
 from Phidget22.Phidget import *
 from Phidget22.Net import *
+from cmath import *
+#from SpatialTry import *
 
 try:
     ch = Spatial()
@@ -16,7 +19,8 @@ except RuntimeError as e:
 def SpatialAttached(e):
     try:
         attached = e
-        e.setCompassCorrectionParameters(self, 0.36341, 0.09927, 0.11774, -0.07688,  2.66012, 2.56018, 3.03476, 0.01156, -0.07656, 0.00600, 0.06844, -0.05628, 0.07447)
+        attached.resetMagnetometerCorrectionParameters()
+        attached.setMagnetometerCorrectionParameters(0.36341, 0.09927, 0.11774, -0.07688,  2.66012, 2.56018, 3.03476, 0.01156, -0.07656, 0.00600, 0.06844, -0.05628, 0.07447)
         print("\nAttach Event Detected (Information Below)")
         print("===========================================")
         print("Library Version: %s" % attached.getLibraryVersion())
@@ -49,22 +53,53 @@ def SpatialDetached(e):
 def ErrorEvent(e, eCode, description):
     print("Error %i : %s" % (eCode, description))
 
+"""def AvarageX(listOfX):
+    
+    avX = 0 
+    sumX = 0
+    count = len(listOfX)
 
+    print("IN THE METHOD") #, count
+
+    for i in listOfX:
+        print("Element: %d" %i)
+        sumX = sumX + i
+        count = count + 1 
+
+   # avX = sumX / count
+
+    return avX"""
 """
 Contains data for acceleration/gyro/compass depending on what the board supports, as well as a timestamp.
 This event is fired at a fixed rate as determined by the DataRate property.
 """
+
 def SpatialDataHandler(e, acceleration, angularRate, fieldStrength, timestamp):
 #write the data into a file
     
-    file = open("calibrated.txt", "a")
+    file = open("NE.txt", "a")
     file.write("Field Strength: %7.3f  %8.3f  %8.3f \n" % (fieldStrength[0], fieldStrength[1], fieldStrength[2]))
-    #file.write("\n")
+    file.write("Acceleration:   %7.3f  %8.3f  %8.3f \n" % (acceleration[0], acceleration[1], acceleration[2]))
+    print("Field Strength: %7.3f  %8.3f  %8.3f" % (fieldStrength[0], fieldStrength[1], fieldStrength[2]))
+    print("Acceleration:   %7.3f  %8.3f  %8.3f" % (acceleration[0], acceleration[1], acceleration[2]))
+    print("Angular rate:   %7.3f  %8.3f  %8.3f \n" % (angularRate[0], angularRate[1], angularRate[2]))
 
+
+    
+    
+"""    with open('spatial_data.csv', 'w') as csvfile:
+        fieldnames = ['FieldStrX', 'FieldStrY', 'FieldStrY', 'AccX', 'AccY', 'AccZ', 'AngRateX', 'AngRateY', 'AngRateZ']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+     
+        writer.writeheader()
+        writer.writerows({'FieldStrX' : fieldStrength[0], 'FieldStrY' : fieldStrength[1], 
+            'FieldStrY' : fieldStrength[2], 'AccX' : acceleration[0], 'AccY' : acceleration[1], 
+            'AccZ' : acceleration[2], 'AngRateX' : angularRate[0], 'AngRateY' : angularRate[1], 
+            'AngRateZ' : angularRate[2]})"""
+    
    # filePlot = open("plotNorthSteadyX.txt", "a")
    # filePlot.write("%7.3f" % (fieldStrength[0]))
 
-    print("Field Strength: %7.3f  %8.3f  %8.3f" % (fieldStrength[0], fieldStrength[1], fieldStrength[2]))
 
     #file.close()
     #stop writing data
@@ -78,15 +113,13 @@ try:
     ch.setOnDetachHandler(SpatialDetached)
     ch.setOnErrorHandler(ErrorEvent)
     ch.setOnSpatialDataHandler(SpatialDataHandler)
-
+   # ch.setMagnetometerCorrectionParameters(0.36341, 0.09927, 0.11774, -0.07688,  2.66012, 2.56018, 3.03476, 0.01156, -0.07656, 0.00600, 0.06844, -0.05628, 0.07447)
+    
     print("Waiting for the Phidget Spatial Object to be attached...")
- #line to clea the file:   open("northToWest.txt", 'w').close()
 
-    file = open("calibrated.txt", "a")
+    file = open("NE.txt", "a")
     file.write("--------------------------------------------")
     #file.write("\n")
-
-    #filePlot = open("plotNorthSteadyX.txt", "a")
 
     ch.openWaitForAttachment(5000)
 
