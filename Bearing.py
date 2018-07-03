@@ -61,15 +61,13 @@ def ErrorEvent(e, eCode, description):
 Contains data for acceleration/gyro/compass depending on what the board supports, as well as a timestamp.
 This event is fired at a fixed rate as determined by the DataRate property.
 """
+
 lastAngles = [0,0,0]
 
 def calculateCompassBearing(e, acceleration, angularRate, fieldStrength, timestamp):
 #write the data into a file
     gravity = [acceleration[0], acceleration[1], acceleration[2]]
     magField = [fieldStrength[0], fieldStrength[1], fieldStrength[2]]
-
-    for i in range(0,3,1):
-                print ("LAST angles: %s" %lastAngles[i])
    
     rollAngle = math.atan2(gravity[1], gravity[2]);
    # print("Roll angle : %s" % rollAngle)
@@ -87,36 +85,35 @@ def calculateCompassBearing(e, acceleration, angularRate, fieldStrength, timesta
   
     print("Bearing before: %s" % compassBearing)
 
-    compassBearingFilter = [[]]
-    Count = 3.0
+    compassBearingFilter = [[0,0,0]]
+
+    Count = len(compassBearingFilter)
+    
     compassBearingFilterSize = 10
 
     try:
         for i in range(0,3,2):
             if math.fabs(angles[i]-lastAngles[i]) > 3:
+                print("TEST")
                 for value in compassBearingFilter:
                     if angles[i] > lastAngles[i]:
                         value[i] += 360 * math.pi/180.0
                     else:
                         value[i] -= 360 * math.pi/180.0
 
-        lastAngles = list(angles)
+        for i in range(len(lastAngles)):
+            lastAngles[i] = angles[i]
 
-        Count += 3.0
-        
         compassBearingFilter.append(lastAngles)
         if Count > compassBearingFilterSize:
-                compassBearingFilter.pop(0)
+            compassBearingFilter.pop(0)
 
         yawAngle = pitchAngle = rollAngle = 0
 
-        for i in compassBearingFilter:
-            rollAngle += i[0]
-            pitchAngle += i[1]
-            yawAngle += i[2]
-
-        for i in range(0,3,1):
-            print ("compassBearingFilter angles: %s" %compassBearingFilter[i])
+        for l in range(len(compassBearingFilter)):
+            rollAngle += compassBearingFilter[l][0]
+            pitchAngle += compassBearingFilter[l][1]
+            yawAngle += compassBearingFilter[l][2]
         
         yawAngle /= Count
         pitchAngle /= Count
@@ -124,10 +121,9 @@ def calculateCompassBearing(e, acceleration, angularRate, fieldStrength, timesta
 
         compassBearing = yawAngle * (180.0 / math.pi)
         print("Bearing after: %s" % compassBearing)
-    
-    except:
-        print(" ")
 
+    except:
+        print()
   #  print("Field Strength: %7.3f  %8.3f  %8.3f" % (fieldStrength[0], fieldStrength[1], fieldStrength[2]))
     
 try:
@@ -149,7 +145,7 @@ except PhidgetException as e:
     exit(1)
 
 print("Gathering data for 10 seconds...")
-time.sleep(1)
+time.sleep(10)
 
 try:
     ch.close()
