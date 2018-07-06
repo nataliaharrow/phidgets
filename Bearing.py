@@ -82,8 +82,14 @@ def calculateCompassBearing(e, acceleration, angularRate, fieldStrength, timesta
     angles = [rollAngle, pitchAngle, yawAngle]
 
     compassBearing = yawAngle * (180.0 / math.pi);
-  
-    print("Bearing before: %s" % compassBearing)
+    if compassBearing < 0:
+        compassBearing += 360.0;
+
+    file = open("dir.txt", "a")
+    file.write("Bearing : %.2f" % compassBearing)
+    file.write('\n')
+
+    print("Bearing : %.2f" % compassBearing)
 
     compassBearingFilter = [[0,0,0]]
 
@@ -94,7 +100,6 @@ def calculateCompassBearing(e, acceleration, angularRate, fieldStrength, timesta
     try:
         for i in range(0,3,2):
             if math.fabs(angles[i]-lastAngles[i]) > 3:
-                print("TEST")
                 for value in compassBearingFilter:
                     if angles[i] > lastAngles[i]:
                         value[i] += 360 * math.pi/180.0
@@ -120,12 +125,11 @@ def calculateCompassBearing(e, acceleration, angularRate, fieldStrength, timesta
         rollAngle /= Count
 
         compassBearing = yawAngle * (180.0 / math.pi)
-        print("Bearing after: %s" % compassBearing)
+     #   print("Bearing after: %.2f" % compassBearing)
 
     except:
         print()
-  #  print("Field Strength: %7.3f  %8.3f  %8.3f" % (fieldStrength[0], fieldStrength[1], fieldStrength[2]))
-    
+  
 try:
     ch.setOnAttachHandler(SpatialAttached)
     ch.setOnDetachHandler(SpatialDetached)
@@ -133,7 +137,8 @@ try:
     ch.setOnSpatialDataHandler(calculateCompassBearing)
    
     print("Waiting for the Phidget Spatial Object to be attached...")
-
+    file = open("dir.txt", "a")
+    file.write("--------------------------------------------")
     #file.write("\n")
 
     ch.openWaitForAttachment(5000)
