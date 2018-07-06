@@ -6,7 +6,6 @@ from Phidget22.PhidgetException import *
 from Phidget22.Phidget import *
 from Phidget22.Net import *
 from cmath import *
-#from SpatialTry import *
 
 try:
     ch = Spatial()
@@ -60,10 +59,7 @@ This event is fired at a fixed rate as determined by the DataRate property.
 
 def SpatialDataHandler(e, acceleration, angularRate, fieldStrength, timestamp):
 #write the data into a file
-    
-    file = open("NE.txt", "a")
-    file.write("Field Strength: %7.3f  %8.3f  %8.3f \n" % (fieldStrength[0], fieldStrength[1], fieldStrength[2]))
-    file.write("Acceleration:   %7.3f  %8.3f  %8.3f \n" % (acceleration[0], acceleration[1], acceleration[2]))
+
     print("Field Strength: %7.3f  %8.3f  %8.3f" % (fieldStrength[0], fieldStrength[1], fieldStrength[2]))
     print("Acceleration:   %7.3f  %8.3f  %8.3f" % (acceleration[0], acceleration[1], acceleration[2]))
     print("Angular rate:   %7.3f  %8.3f  %8.3f \n" % (angularRate[0], angularRate[1], angularRate[2]))
@@ -84,15 +80,9 @@ try:
     
     print("Waiting for the Phidget Spatial Object to be attached...")
 
-    file = open("NE.txt", "a")
-    filecsv = open("spatial_data.csv", "a")
-    file.write("--------------------------------------------")
-
     with open('spatial_data.csv', 'a') as csv_file:
         fields = ['FieldStrX', 'FieldStrY', 'FieldStrZ', 'AccX', 'AccY', 'AccZ', 'AngRateX', 'AngRateY', 'AngRateZ']
         csv_writer = csv.DictWriter(csv_file, fieldnames=fields)
-        csv_writer.writeheader()
-    #file.write("\n")
 
     ch.openWaitForAttachment(5000)
 
@@ -103,7 +93,7 @@ except PhidgetException as e:
     exit(1)
 
 print("Gathering data for 10 seconds...")
-time.sleep(1)
+time.sleep(10)
 
 try:
     ch.close()
