@@ -63,13 +63,14 @@ def SpatialDataHandler(e, acceleration, angularRate, fieldStrength, timestamp):
     print("Field Strength: %7.3f  %8.3f  %8.3f" % (fieldStrength[0], fieldStrength[1], fieldStrength[2]))
     print("Acceleration:   %7.3f  %8.3f  %8.3f" % (acceleration[0], acceleration[1], acceleration[2]))
     print("Angular rate:   %7.3f  %8.3f  %8.3f \n" % (angularRate[0], angularRate[1], angularRate[2]))
+    print("Timestamp: %f\n" % timestamp)
+    timestamp = timestamp/1000
 
-    
     with open('spatial_data.csv', 'a') as csv_file:
         csv_writer = csv.DictWriter(csv_file, fieldnames=fields)
-        csv_writer.writerow({'FieldStrX' : fieldStrength[0], 'FieldStrY' : fieldStrength[1], 'FieldStrZ' : fieldStrength[1],
-                            'AccX' : acceleration[0], 'AccY' : acceleration[1], 'AccZ' : acceleration[2], 
-                            'AngRateX' : angularRate[0], 'AngRateY' : angularRate[1], 'AngRateZ' : angularRate[2]}) 
+        csv_writer.writerow({'FieldStrX' : round(fieldStrength[0],3), 'FieldStrY' : round(fieldStrength[1],3), 'FieldStrZ' : round(fieldStrength[1],3),
+                            'AccX' : round(acceleration[0],4), 'AccY' : round(acceleration[1],4), 'AccZ' :round(acceleration[2],4), 
+                            'AngRateX' : angularRate[0], 'AngRateY' : angularRate[1], 'AngRateZ' : angularRate[2], 'TimeStmp' : timestamp}) 
    
 try:
     ch.setOnAttachHandler(SpatialAttached)
@@ -80,9 +81,10 @@ try:
     
     print("Waiting for the Phidget Spatial Object to be attached...")
 
-    with open('spatial_data.csv', 'a') as csv_file:
-        fields = ['FieldStrX', 'FieldStrY', 'FieldStrZ', 'AccX', 'AccY', 'AccZ', 'AngRateX', 'AngRateY', 'AngRateZ']
+    with open('spatial_data.csv', 'w') as csv_file:
+        fields = ['FieldStrX', 'FieldStrY', 'FieldStrZ', 'AccX', 'AccY', 'AccZ', 'AngRateX', 'AngRateY', 'AngRateZ', 'TimeStmp']
         csv_writer = csv.DictWriter(csv_file, fieldnames=fields)
+        csv_writer.writeheader()
 
     ch.openWaitForAttachment(5000)
 
@@ -93,7 +95,7 @@ except PhidgetException as e:
     exit(1)
 
 print("Gathering data for 10 seconds...")
-time.sleep(10)
+time.sleep(2)
 
 try:
     ch.close()
